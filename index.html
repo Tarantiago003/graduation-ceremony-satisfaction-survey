@@ -341,12 +341,12 @@
   <div id="step2" style="display:none">
     <div class="section-card">
       <div class="section-title"><span class="section-icon">🏛️</span> Venue &amp; logistics</div>
-      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>4 – Strongly agree</span></div>
       <div id="q-group-1"></div>
     </div>
     <div class="section-card">
       <div class="section-title"><span class="section-icon">📢</span> Program flow</div>
-      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>4 – Strongly agree</span></div>
       <div id="q-group-2"></div>
     </div>
     <button class="btn-primary" onclick="goStep(3)">Continue →</button>
@@ -356,12 +356,12 @@
   <div id="step3" style="display:none">
     <div class="section-card">
       <div class="section-title"><span class="section-icon">🤝</span> Staff &amp; service</div>
-      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>4 – Strongly agree</span></div>
       <div id="q-group-3"></div>
     </div>
     <div class="section-card">
       <div class="section-title"><span class="section-icon">💚</span> Overall experience</div>
-      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>4 – Strongly agree</span></div>
       <div id="q-group-4"></div>
     </div>
     <button class="btn-primary" onclick="goStep(4)">Continue →</button>
@@ -411,6 +411,9 @@
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFAHVmHjrbjXi8A2V8D_BJNnccwtGnAIDBWrA3IsqirngfL_zWpW75s1w4sAIMozbp/exec';
 
+const SCALE = [1, 2, 3, 4];
+const SCALE_LABELS = ['Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'];
+
 const questions = [
   { group: 1, text: 'The registration and entry process was organized and efficient.' },
   { group: 1, text: 'The venue was clean, comfortable, and appropriate for the ceremony.' },
@@ -444,9 +447,9 @@ function renderGroup(gid, containerId) {
       row.innerHTML = `
         <span class="q-text">Q${qi}. ${q.text}</span>
         <div class="likert" id="lik-${qi}">
-          ${[1,2,3,4,5].map(v =>
+          ${SCALE.map((v, i) =>
             `<button class="likert-btn" onclick="rate(${qi},${v},this)"
-              title="${['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'][v-1]}">
+              title="${SCALE_LABELS[i]}">
               ${v}
             </button>`
           ).join('')}
