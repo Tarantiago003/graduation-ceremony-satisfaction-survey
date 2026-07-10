@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVGFC Graduation Ceremony Satisfaction Survey</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark: #1B5E20;
+    --green-mid:  #2E7D32;
+    --green-light: #4CAF50;
+    --green-tint: #E8F5E9;
+    --green-border: #A5D6A7;
+    --text: #1a1a1a;
+    --text-sub: #555;
+    --text-muted: #888;
+    --surface: #fff;
+    --surface-alt: #f8f9f8;
+    --border: rgba(0,0,0,.1);
+    --border-strong: rgba(0,0,0,.18);
+    --radius: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #f0f0f0;
+      --text-sub: #aaa;
+      --text-muted: #666;
+      --surface: #1e1e1e;
+      --surface-alt: #252525;
+      --border: rgba(255,255,255,.1);
+      --border-strong: rgba(255,255,255,.2);
+      --green-tint: #0a2e0d;
+      --green-border: #2e5e32;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--surface-alt);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .wrap { max-width: 680px; margin: 0 auto; }
+
+  .hero {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    border-radius: 16px;
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 1.25rem;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.2);
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 20px;
+    font-size: 13px;
+    padding: 5px 16px;
+    margin-bottom: 14px;
+  }
+  .hero h1 { font-size: 24px; font-weight: 500; margin-bottom: 6px; }
+  .hero p  { font-size: 14px; opacity: .85; }
+
+  .prog-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .prog-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .prog-label { font-size: 13px; color: var(--text-sub); }
+  .prog-pct   { font-size: 13px; font-weight: 500; color: var(--green-mid); }
+  .prog-bar   { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 10px; }
+  .prog-fill  { height: 100%; background: linear-gradient(90deg, var(--green-dark), var(--green-light)); border-radius: 99px; transition: width .5s ease; }
+  .stars { display: flex; gap: 6px; }
+  .star { font-size: 20px; opacity: .25; transition: opacity .3s, transform .3s; }
+  .star.lit { opacity: 1; transform: scale(1.15); }
+
+  .milestone {
+    background: var(--green-tint);
+    border: 0.5px solid var(--green-border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--green-dark);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+  }
+  .milestone.show { opacity: 1; transform: translateY(0); }
+
+  .section-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-icon {
+    width: 30px; height: 30px;
+    background: var(--green-tint);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green-mid);
+    font-size: 16px;
+  }
+
+  .q-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 0.5px solid var(--border);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .q-row:first-of-type { border-top: none; padding-top: 0; }
+  .q-text { font-size: 13px; color: var(--text-sub); flex: 1; min-width: 180px; }
+  .likert { display: flex; gap: 5px; flex-shrink: 0; }
+  .likert-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: 0.5px solid var(--border-strong);
+    background: var(--surface-alt);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    color: var(--text-sub);
+    transition: all .15s;
+  }
+  .likert-btn:hover { background: var(--green-tint); border-color: var(--green-mid); color: var(--green-dark); }
+  .likert-btn.sel   { background: var(--green-mid); border-color: var(--green-mid); color: #fff; }
+
+  .likert-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: .75rem;
+    padding: 0 2px;
+  }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .info-grid .full { grid-column: 1 / -1; }
+  .field-label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+
+  input[type=text], select, textarea {
+    width: 100%;
+    font-size: 13px;
+    padding: 9px 12px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+  }
+  input[type=text]:focus, select:focus, textarea:focus { border-color: var(--green-mid); }
+  textarea { resize: none; height: 72px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--green-dark);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, opacity .2s;
+    margin-top: .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--green-mid); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+
+  .dpa-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-sub);
+    background: var(--surface-alt);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .consent-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--green-tint);
+    border: 0.5px solid var(--green-border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+  .consent-box input[type=checkbox] {
+    width: 18px; height: 18px;
+    accent-color: var(--green-dark);
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+  .consent-box span {
+    font-size: 13px;
+    color: var(--green-dark);
+    line-height: 1.6;
+  }
+
+  .success-screen { text-align: center; padding: 3rem 1rem; }
+  .success-screen .trophy { font-size: 56px; margin-bottom: 1rem; }
+  .success-screen h2 { font-size: 22px; font-weight: 500; margin-bottom: .5rem; }
+  .success-screen p  { font-size: 14px; color: var(--text-sub); margin-bottom: 1.5rem; }
+  .xp-badge {
+    display: inline-block;
+    background: var(--green-tint);
+    border: 0.5px solid var(--green-border);
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    color: var(--green-dark);
+    font-weight: 500;
+  }
+  .xp-badge span { font-size: 28px; font-weight: 700; display: block; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .info-grid .full { grid-column: 1; }
+    .likert-btn { width: 30px; height: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── STEP 0: DATA PRIVACY CONSENT ── -->
+  <div id="step0">
+    <div class="hero">
+      <div class="hero-badge">🎓 Class of 2025 — Post-Ceremony Survey</div>
+      <h1>Before we begin</h1>
+      <p>Your privacy matters. Read how MVGFC will use your feedback.</p>
+    </div>
+
+    <div class="section-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid var(--border)">
+        <div style="width:36px;height:36px;background:var(--green-tint);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">🛡️</div>
+        <div>
+          <div style="font-size:15px;font-weight:500;color:var(--text)">Data Privacy Act Notice</div>
+          <div style="font-size:12px;color:var(--text-sub);margin-top:2px">Manuel V. Gallego Foundation Colleges, Inc.</div>
+        </div>
+      </div>
+
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--green-tint);border:0.5px solid var(--green-border);border-radius:6px;font-size:12px;color:var(--green-dark);padding:4px 12px;font-weight:500;margin-bottom:14px">
+        📄 Republic Act No. 10173 — Data Privacy Act of 2012
+      </div>
+
+      <p style="font-size:13px;color:var(--text-sub);line-height:1.7;margin-bottom:14px">
+        In compliance with the Data Privacy Act of 2012 and its Implementing Rules and Regulations, MVGFC informs you that personal information collected through this survey will be processed for the following purposes:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div class="dpa-point"><span style="flex-shrink:0">📊</span> To evaluate and improve the quality of graduation ceremonies and institutional events.</div>
+        <div class="dpa-point"><span style="flex-shrink:0">📋</span> To generate statistical reports for internal administrative and academic planning purposes.</div>
+        <div class="dpa-point"><span style="flex-shrink:0">🔒</span> Responses will be kept strictly confidential and reported only in aggregated, anonymized form.</div>
+        <div class="dpa-point"><span style="flex-shrink:0">👤</span> Your name is optional. No personally identifiable information will be shared with third parties.</div>
+        <div class="dpa-point"><span style="flex-shrink:0">🗑️</span> Data will be retained only for as long as necessary for the stated purpose, after which it will be securely disposed of.</div>
+      </div>
+
+      <p style="font-size:13px;color:var(--text-sub);line-height:1.7">
+        You have the right to access, correct, or request deletion of your personal data. For concerns, contact the MVGFC Data Privacy Officer.
+      </p>
+    </div>
+
+    <label class="consent-box">
+      <input type="checkbox" id="consent-cb" onchange="toggleConsent(this)">
+      <span>I have read and understood the Data Privacy Act Notice above. I voluntarily give my consent to MVGFC to collect and process my survey responses for the stated purposes.</span>
+    </label>
+
+    <button class="btn-primary" id="consent-btn" onclick="beginSurvey()" disabled>
+      Start the survey →
+    </button>
+    <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted)">
+      Participation is voluntary. You may close this page at any time.
+    </p>
+  </div>
+
+  <!-- ── SURVEY CHROME (hidden until consent given) ── -->
+  <div id="survey-chrome" style="display:none">
+    <div class="hero">
+      <div class="hero-badge">🎓 Class of 2025 — Post-Ceremony Survey</div>
+      <h1>How was your graduation?</h1>
+      <p>Your honest feedback helps MVGFC make every ceremony better.</p>
+    </div>
+
+    <div class="prog-card">
+      <div class="prog-top">
+        <span class="prog-label" id="prog-label">Step 1 of 4 — Your information</span>
+        <span class="prog-pct" id="prog-pct">0%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="stars">
+        <span class="star" id="s1" title="25% done">⭐</span>
+        <span class="star" id="s2" title="50% done">⭐</span>
+        <span class="star" id="s3" title="75% done">⭐</span>
+        <span class="star" id="s4" title="100% done">⭐</span>
+      </div>
+    </div>
+
+    <div class="milestone" id="milestone-box">
+      <span id="milestone-icon">🏅</span>
+      <span id="milestone-text">Section complete!</span>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: Respondent Info ── -->
+  <div id="step1" style="display:none">
+    <div class="section-card">
+      <div class="section-title">
+        <span class="section-icon">👤</span>
+        Your information
+      </div>
+      <div class="info-grid">
+        <div>
+          <label class="field-label">Name (optional)</label>
+          <input type="text" id="r-name" placeholder="Juan dela Cruz">
+        </div>
+        <div>
+          <label class="field-label">Program / Course</label>
+          <input type="text" id="r-program" placeholder="e.g. BSIS, BSBA">
+        </div>
+        <div class="full">
+          <label class="field-label">College / Department</label>
+          <select id="r-dept">
+            <option value="">Select your college or department</option>
+            <option>IBM</option>
+            <option>ICJE</option>
+            <option>ITE</option>
+            <option>IICT</option>
+            <option>INAHS</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+  </div>
+
+  <!-- ── STEP 2: Venue & Program Flow ── -->
+  <div id="step2" style="display:none">
+    <div class="section-card">
+      <div class="section-title"><span class="section-icon">🏛️</span> Venue &amp; logistics</div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div id="q-group-1"></div>
+    </div>
+    <div class="section-card">
+      <div class="section-title"><span class="section-icon">📢</span> Program flow</div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div id="q-group-2"></div>
+    </div>
+    <button class="btn-primary" onclick="goStep(3)">Continue →</button>
+  </div>
+
+  <!-- ── STEP 3: Staff & Experience ── -->
+  <div id="step3" style="display:none">
+    <div class="section-card">
+      <div class="section-title"><span class="section-icon">🤝</span> Staff &amp; service</div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div id="q-group-3"></div>
+    </div>
+    <div class="section-card">
+      <div class="section-title"><span class="section-icon">💚</span> Overall experience</div>
+      <div class="likert-legend"><span>1 – Strongly disagree</span><span>5 – Strongly agree</span></div>
+      <div id="q-group-4"></div>
+    </div>
+    <button class="btn-primary" onclick="goStep(4)">Continue →</button>
+  </div>
+
+  <!-- ── STEP 4: Open Feedback ── -->
+  <div id="step4" style="display:none">
+    <div class="section-card">
+      <div class="section-title"><span class="section-icon">💬</span> Open feedback</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label class="field-label">What did you like the most?</label>
+          <textarea id="oe1" placeholder="The best part of the ceremony was…"></textarea>
+        </div>
+        <div>
+          <label class="field-label">What needs improvement?</label>
+          <textarea id="oe2" placeholder="One thing I'd change…"></textarea>
+        </div>
+        <div>
+          <label class="field-label">Suggestions for future ceremonies</label>
+          <textarea id="oe3" placeholder="Next time, MVGFC should…"></textarea>
+        </div>
+        <div>
+          <label class="field-label">Other comments or feedback</label>
+          <textarea id="oe4" placeholder="Anything else you'd like to share…"></textarea>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" id="submit-btn" onclick="submitSurvey()">
+      Submit my feedback ✓
+    </button>
+  </div>
+
+  <!-- ── STEP 5: Success ── -->
+  <div id="step5" style="display:none">
+    <div class="success-screen">
+      <div class="trophy">🎓</div>
+      <h2>Thank you, graduate!</h2>
+      <p>Your feedback has been recorded and will help MVGFC deliver an even better ceremony for future graduates. Congratulations on your achievement!</p>
+      <div class="xp-badge">
+        <span id="final-xp">0</span>
+        Survey XP earned!
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:1.5rem">Manuel V. Gallego Foundation Colleges, Inc.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFAHVmHjrbjXi8A2V8D_BJNnccwtGnAIDBWrA3IsqirngfL_zWpW75s1w4sAIMozbp/exec';
+
+const questions = [
+  { group: 1, text: 'The registration and entry process was organized and efficient.' },
+  { group: 1, text: 'The venue was clean, comfortable, and appropriate for the ceremony.' },
+  { group: 1, text: 'The seating arrangement was well organized.' },
+  { group: 2, text: 'The audio system allowed me to clearly hear the program.' },
+  { group: 2, text: 'The visual presentation (screen/projector) was clear and helpful.' },
+  { group: 2, text: 'The graduation program started and ended at a reasonable time.' },
+  { group: 2, text: 'The ceremony was conducted in an orderly and professional manner.' },
+  { group: 2, text: 'The graduation rites were solemn and meaningful.' },
+  { group: 2, text: 'The program was well-paced and engaging.' },
+  { group: 3, text: 'The faculty and staff were courteous and helpful.' },
+  { group: 3, text: 'The ushers and marshals provided clear guidance.' },
+  { group: 3, text: 'The safety and security arrangements were adequate.' },
+  { group: 4, text: 'I felt recognized and valued during the ceremony.' },
+  { group: 4, text: 'The event reflected the values and standards of MVGFC.' },
+  { group: 4, text: 'My family and guests appeared satisfied with the overall arrangements.' },
+  { group: 4, text: 'Overall, I am satisfied with the graduation ceremony.' },
+  { group: 4, text: 'I would recommend maintaining a similar format for future graduation ceremonies.' },
+];
+
+const answers = {};
+let totalXP = 0;
+
+function renderGroup(gid, containerId) {
+  const container = document.getElementById(containerId);
+  questions
+    .filter(q => q.group === gid)
+    .forEach(q => {
+      const qi = questions.indexOf(q) + 1;
+      const row = document.createElement('div');
+      row.className = 'q-row';
+      row.innerHTML = `
+        <span class="q-text">Q${qi}. ${q.text}</span>
+        <div class="likert" id="lik-${qi}">
+          ${[1,2,3,4,5].map(v =>
+            `<button class="likert-btn" onclick="rate(${qi},${v},this)"
+              title="${['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'][v-1]}">
+              ${v}
+            </button>`
+          ).join('')}
+        </div>`;
+      container.appendChild(row);
+    });
+}
+
+function rate(qi, val, el) {
+  const wasAnswered = answers[qi] !== undefined;
+  answers[qi] = val;
+  if (!wasAnswered) totalXP += 10;
+  document.querySelectorAll(`#lik-${qi} .likert-btn`).forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  const pct = Math.round((answered / questions.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  [25, 50, 75, 100].forEach((t, i) => {
+    document.getElementById('s' + (i + 1)).classList.toggle('lit', pct >= t);
+  });
+}
+
+function showMilestone(icon, text) {
+  const box = document.getElementById('milestone-box');
+  document.getElementById('milestone-icon').textContent = icon;
+  document.getElementById('milestone-text').textContent = text;
+  box.classList.add('show');
+  setTimeout(() => box.classList.remove('show'), 3500);
+}
+
+const stepLabels = [
+  'Step 1 of 4 — Your information',
+  'Step 2 of 4 — Venue & program flow',
+  'Step 3 of 4 — Staff & experience',
+  'Step 4 of 4 — Open feedback',
+  'Done!',
+];
+
+function goStep(n) {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('step' + i).style.display = (i === n) ? 'block' : 'none';
+  }
+  if (document.getElementById('prog-label')) {
+    document.getElementById('prog-label').textContent = stepLabels[n - 1] || 'Done!';
+  }
+  if (n === 2) { totalXP += 10; showMilestone('🎓', "Info saved! +10 XP — let's go!"); }
+  if (n === 3) { totalXP += 30; showMilestone('🏅', 'Venue & program done! +30 XP'); }
+  if (n === 4) { totalXP += 20; showMilestone('✨', 'Almost there! +20 XP — one last section!'); }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleConsent(cb) {
+  const btn = document.getElementById('consent-btn');
+  btn.disabled = !cb.checked;
+}
+
+function beginSurvey() {
+  document.getElementById('step0').style.display = 'none';
+  document.getElementById('survey-chrome').style.display = 'block';
+  goStep(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function submitSurvey() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Submitting…';
+
+  totalXP += 40;
+
+  const payload = {
+    timestamp:  new Date().toISOString(),
+    name:       document.getElementById('r-name').value.trim() || 'Anonymous',
+    program:    document.getElementById('r-program').value.trim(),
+    department: document.getElementById('r-dept').value,
+    q1:  answers[1]  || '',
+    q2:  answers[2]  || '',
+    q3:  answers[3]  || '',
+    q4:  answers[4]  || '',
+    q5:  answers[5]  || '',
+    q6:  answers[6]  || '',
+    q7:  answers[7]  || '',
+    q8:  answers[8]  || '',
+    q9:  answers[9]  || '',
+    q10: answers[10] || '',
+    q11: answers[11] || '',
+    q12: answers[12] || '',
+    q13: answers[13] || '',
+    q14: answers[14] || '',
+    q15: answers[15] || '',
+    q16: answers[16] || '',
+    q17: answers[17] || '',
+    oe1: document.getElementById('oe1').value.trim(),
+    oe2: document.getElementById('oe2').value.trim(),
+    oe3: document.getElementById('oe3').value.trim(),
+    oe4: document.getElementById('oe4').value.trim(),
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) {
+    console.error('Submission error:', e);
+  }
+
+  document.getElementById('final-xp').textContent = totalXP;
+  goStep(5);
+}
+
+renderGroup(1, 'q-group-1');
+renderGroup(2, 'q-group-2');
+renderGroup(3, 'q-group-3');
+renderGroup(4, 'q-group-4');
+</script>
+</body>
+</html>
