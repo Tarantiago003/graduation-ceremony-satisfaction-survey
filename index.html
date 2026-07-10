@@ -77,30 +77,8 @@
   .prog-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
   .prog-label { font-size: 13px; color: var(--text-sub); }
   .prog-pct   { font-size: 13px; font-weight: 500; color: var(--green-mid); }
-  .prog-bar   { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 10px; }
+  .prog-bar   { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
   .prog-fill  { height: 100%; background: linear-gradient(90deg, var(--green-dark), var(--green-light)); border-radius: 99px; transition: width .5s ease; }
-  .stars { display: flex; gap: 6px; }
-  .star { font-size: 20px; opacity: .25; transition: opacity .3s, transform .3s; }
-  .star.lit { opacity: 1; transform: scale(1.15); }
-
-  .milestone {
-    background: var(--green-tint);
-    border: 0.5px solid var(--green-border);
-    border-radius: 10px;
-    padding: 10px 16px;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--green-dark);
-    font-weight: 500;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition: opacity .3s, transform .3s;
-    pointer-events: none;
-  }
-  .milestone.show { opacity: 1; transform: translateY(0); }
 
   .section-card {
     background: var(--surface);
@@ -238,17 +216,7 @@
   .success-screen { text-align: center; padding: 3rem 1rem; }
   .success-screen .trophy { font-size: 56px; margin-bottom: 1rem; }
   .success-screen h2 { font-size: 22px; font-weight: 500; margin-bottom: .5rem; }
-  .success-screen p  { font-size: 14px; color: var(--text-sub); margin-bottom: 1.5rem; }
-  .xp-badge {
-    display: inline-block;
-    background: var(--green-tint);
-    border: 0.5px solid var(--green-border);
-    border-radius: 12px;
-    padding: 1rem 2rem;
-    color: var(--green-dark);
-    font-weight: 500;
-  }
-  .xp-badge span { font-size: 28px; font-weight: 700; display: block; }
+  .success-screen p  { font-size: 14px; color: var(--text-sub); margin-bottom: 1rem; }
 
   .spinner {
     width: 18px; height: 18px;
@@ -334,17 +302,6 @@
         <span class="prog-pct" id="prog-pct">0%</span>
       </div>
       <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-      <div class="stars">
-        <span class="star" id="s1" title="25% done">⭐</span>
-        <span class="star" id="s2" title="50% done">⭐</span>
-        <span class="star" id="s3" title="75% done">⭐</span>
-        <span class="star" id="s4" title="100% done">⭐</span>
-      </div>
-    </div>
-
-    <div class="milestone" id="milestone-box">
-      <span id="milestone-icon">🏅</span>
-      <span id="milestone-text">Section complete!</span>
     </div>
   </div>
 
@@ -443,7 +400,8 @@
     <div class="success-screen">
       <div class="trophy">🎓</div>
       <h2>Thank you, graduate!</h2>
-      <p>Your feedback has been recorded and will help MVGFC deliver an even better ceremony for future graduates. Congratulations on your achievement!</p>
+      <p>Your feedback has been recorded and will help MVGFC deliver an even better ceremony for future graduates.</p>
+      <p>Congratulations on your achievement!</p>
       <p style="font-size:12px;color:var(--text-muted);margin-top:1.5rem">Manuel V. Gallego Foundation Colleges, Inc.</p>
     </div>
   </div>
@@ -474,7 +432,6 @@ const questions = [
 ];
 
 const answers = {};
-let totalXP = 0;
 
 function renderGroup(gid, containerId) {
   const container = document.getElementById(containerId);
@@ -499,9 +456,7 @@ function renderGroup(gid, containerId) {
 }
 
 function rate(qi, val, el) {
-  const wasAnswered = answers[qi] !== undefined;
   answers[qi] = val;
-  if (!wasAnswered) totalXP += 10;
   document.querySelectorAll(`#lik-${qi} .likert-btn`).forEach(b => b.classList.remove('sel'));
   el.classList.add('sel');
   updateProgress();
@@ -512,17 +467,6 @@ function updateProgress() {
   const pct = Math.round((answered / questions.length) * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-pct').textContent = pct + '%';
-  [25, 50, 75, 100].forEach((t, i) => {
-    document.getElementById('s' + (i + 1)).classList.toggle('lit', pct >= t);
-  });
-}
-
-function showMilestone(icon, text) {
-  const box = document.getElementById('milestone-box');
-  document.getElementById('milestone-icon').textContent = icon;
-  document.getElementById('milestone-text').textContent = text;
-  box.classList.add('show');
-  setTimeout(() => box.classList.remove('show'), 3500);
 }
 
 const stepLabels = [
@@ -537,18 +481,12 @@ function goStep(n) {
   for (let i = 1; i <= 5; i++) {
     document.getElementById('step' + i).style.display = (i === n) ? 'block' : 'none';
   }
-  if (document.getElementById('prog-label')) {
-    document.getElementById('prog-label').textContent = stepLabels[n - 1] || 'Done!';
-  }
-  if (n === 2) { totalXP += 10; showMilestone('🎓', "Info saved! +10 XP — let's go!"); }
-  if (n === 3) { totalXP += 30; showMilestone('🏅', 'Venue & program done! +30 XP'); }
-  if (n === 4) { totalXP += 20; showMilestone('✨', 'Almost there! +20 XP — one last section!'); }
+  document.getElementById('prog-label').textContent = stepLabels[n - 1] || 'Done!';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleConsent(cb) {
-  const btn = document.getElementById('consent-btn');
-  btn.disabled = !cb.checked;
+  document.getElementById('consent-btn').disabled = !cb.checked;
 }
 
 function beginSurvey() {
@@ -562,8 +500,6 @@ async function submitSurvey() {
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Submitting…';
-
-  totalXP += 40;
 
   const payload = {
     timestamp:  new Date().toISOString(),
@@ -604,7 +540,6 @@ async function submitSurvey() {
     console.error('Submission error:', e);
   }
 
-  document.getElementById('final-xp').textContent = totalXP;
   goStep(5);
 }
 
